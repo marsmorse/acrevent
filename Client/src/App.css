@@ -1,0 +1,117 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.Landing-photo {
+  width: 518.61px;
+  height: 387.18px;
+  background: url(./concert.jpg);
+  box-shadow: 48px 24px 48px rgba(24, 37, 56, 0.12);
+  border-radius: 8px;
+  transform: rotate(-7deg);
+  background-size: cover;
+}
+:root {
+  --primary-color: #8EC6B8;
+  --primary-color-bright: #8FDECB;
+  --secondary-color: #1C2F42;
+  --accent-color: #FFC278;
+  --button-color: #F12D5C;
+  --light-grey: #FAF8F9;
+
+}
+.list-cont {
+  width: 300px;
+  margin-top: 80px;
+
+}
+.events-cont {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10% 5%;
+  align-content: space-around;
+  background-color: var(--light-grey);
+}
+@media only screen and (min-width: 1000px) {
+  .events-cont {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+}
+p {
+  font-family: Hind, Arial, Helvetica, sans-serif;
+  font-weight: 400
+}
+a {
+  font-family: Hind, Arial, Helvetica, sans-serif;
+  font-weight: 800;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--primary-color-bright);
+}
+h1 h2 h3 h4 h5 {
+  font-family: 'Poppins', sans-serif;
+}
+h1 {
+
+  font-weight: 900;
+}
+h2 {
+
+  font-weight: 800;
+}
+h3 {
+
+  font-weight: 700;
+}
+h4 {
+
+  font-weight: 600;
+}
+h4 {
+
+  font-weight: 500;
+}
+.btn-primary {
+  background-color: var(--button-color);
+  border: none;
+}
+.btn-primary:hover {
+  background-color: black;
+}
+
+.bold {
+  font-weight: 700;
+}
+.dropdown-link {
+  color: var(--secondary-color);
+  font-family: Hind, Arial;
+  font-weight: 800;
+}
+.highlight {
+  color: var(--secondary-color);
+  font-weight: 800;
+}
+.caret:hover {
+  color:#282c34;
+}
