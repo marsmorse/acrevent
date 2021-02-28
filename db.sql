@@ -46,6 +46,10 @@ CREATE TABLE user_creatives (
     PRIMARY KEY(u_id, c_id)
 );
 
+GRANT ALL ON user_creatives TO api
+GRANT ALL ON creatives TO api
+GRANT ALL ON users TO api
+
 -- TRIGGERS --
 -- check triggers with \dft
 -- see triggers attached to tables with  \dS <table name>
@@ -87,7 +91,7 @@ CREATE TRIGGER dec_on_user_creatives_insert
   FOR EACH ROW
   EXECUTE PROCEDURE dec_counts();
 
--- user_creatives delete trigger
+-- Test Triggers
 CREATE FUNCTION test()
   RETURNS TRIGGER 
   LANGUAGE PLPGSQL

@@ -52,6 +52,7 @@
 }
 @media only screen and (min-width: 1000px) {
   .events-cont {
+    align-items: flex-start;
     flex-direction: row;
     justify-content: space-around;
   }
@@ -114,4 +115,25 @@ h4 {
 }
 .caret:hover {
   color:#282c34;
+}
+.form-cont {
+  width: 100%;
+  max-width: 330px;
+  padding: 30px;
+  margin: auto;
+  background-color: var(--light-grey);
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+}
+.form-label {
+
+}
+.form-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
 }

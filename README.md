@@ -1,6 +1,9 @@
 # Acrevent #
 ## Description ##
 A web app designed show you when your favorite "creatives" ( comedians, musicians, etc.) are playing a show in your area and when ticket sales start.
+
+//Photo by Mark Angelo from Pexels
+
 ## Competitive Landscape ##
 - Spotify with Eventbrite [https://www.eventbrite.com/blog/eventbrite-connects-music-fans-with-concerts-they-love-on-spotify-ds0d/]
   - > Spotify will now recommend Eventbrite events to listeners based on their music preferences and alongside their favorite artists and albums, in addition to emailing an artist’s followers when new tour dates are posted"
@@ -12,18 +15,12 @@ This program uses the following technologies:
 - [Redis](https://redis.io/) as a in memory store for session information. Chose redis to have control over my eviction policy as well as the flexibility that it's data structures can provide. reference: [https://www.infoworld.com/article/3063161/why-redis-beats-memcached-for-caching.html]
 - HTML5 and CSS for front end
 - Javascript with fetch for front end
-
-## Database Usage ##
-### Registration
-- Insert new users in users table with registration data
-- query users table for an email to see if it exists in DB
-### Sign in
-- query users table with email and password [sign in]
-### Profile Actions
-- sign out
-- delete account
-- change password
-### Creative Page Actions
+- session store with redis over JWT tokens: http://cryto.net/~joepie91/blog/2016/06/13/stop-using-jwt-for-sessions/
+### Reset Database
+curl -X GET http://localhost:5000/dev/clear 
+ssh into db using private info doc
+copy and paste SQL commands from db.sql 
+Done
 #### WARNING: atomicity issues with incr and decr
 - group or single delete row in creatives if u_count == 1
 - incr or decr u_count in creatives table
@@ -51,6 +48,13 @@ This program uses the following technologies:
 ## reasoning behind certain decisions to improve performance ## 
     - priotitize batch inserts over sequential inserts [https://stackoverflow.com/questions/1793169/which-is-faster-multiple-single-inserts-or-one-multiple-row-insert]
     - sql over no sql []
+
+    - db.js file sets up a pool connection to the database because https://node-postgres.com/guides/project-structure 
+        because:
+        Allows my project to adjust to any changes to the node-postgres API without having to trace down all the places I directly use node-postgres in my application.
+        Allows me to have a single place to put logging and diagnostics around my database.
+        Allows me to make custom extensions to my database access code & share it throughout the project.
+        Allows a single place to bootstrap & configure the database.
 
 ####  BLOG POST  ####
 title(working): My full stack project over view 
