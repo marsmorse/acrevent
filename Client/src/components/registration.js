@@ -2,9 +2,7 @@ import React from 'react';
 
 class Registration extends React.Component {
 
-    constructor(props) {
-        super(props);
-    }
+  
     handleChange = (event) => {
       console.log(event.target.value)
     }

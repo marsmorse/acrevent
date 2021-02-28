@@ -1,15 +1,11 @@
 import React from 'react';
 
-import * as ACTION_TYPES from '../store/action-types'
 import * as ACTIONS from '../store/actions'
 
 import { connect } from 'react-redux'
 
 class LogIn extends React.Component {
 
-    constructor(props) {
-        super(props);
-    }
     handleChange = (event) => {
         console.log(event.target.value)
     }

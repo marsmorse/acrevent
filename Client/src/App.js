@@ -1,15 +1,25 @@
-import logo from './logo.svg';
 import './App.css';
+
 import Events from './components/events.js'
-import Creatives from './components/creatives.js'
+import CreativesList from './components/creatives.js'
+import LogIn from './components/log-in.js'
+import Registration from './components/registration.js'
+import Home from './components/home.js'
+
+import { Route, Switch, Link, HashRouter } from "react-router-dom"
+
+if(typeof(String.prototype.trim) === "undefined")
+{
+    String.prototype.trim = function() 
+    {
+        return String(this).replace(/^\s+|\s+$/g, '');
+    };
+}
 function App() {
   return (
     <div className="App">
-      <h2>Hello Lebron</h2>
-      <h4>Check out your upcoming events!</h4>
-      {logo}
         <div className="dropdown">
-          <a className="dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"><span className="caret"></span>
+          <a className="dropdown-toggle" href="#" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"><span className="caret"></span>
           </a>
           <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <li><h3 className="dropdown-item bold">Lebron</h3></li>
@@ -18,17 +28,55 @@ function App() {
             <li><a className="dropdown-item dropdown-link" href="#">Delete Account</a></li>
           </ul>
         </div>
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <button type="button" className="btn btn-lg btn-primary">Get Started</button>
-        <div className="Landing-photo"/>
-      </header>
-      <Events/>
-      <Creatives/>
+
+        <HashRouter>
+          <nav>
+            <ul>
+              <li>
+                <Link to="/Home">Home</Link>
+              </li>
+              <li>
+                <Link to="/Events">Events</Link>
+              </li>
+              <li>
+                <Link to="/Registration">Registration</Link>
+              </li>
+              <li>
+                <Link to="/LogIn">Log In</Link>
+              </li>
+              <li>
+                <Link to="/Creatives">Creatives</Link>
+              </li>
+            </ul>
+          </nav>
+          <Switch>
+            <Route path='/Home'>
+              <Home/>
+            </Route>
+            <Route path='/Events'>
+              <Events/>
+            </Route>
+            <Route path='/Creatives'>
+              <CreativesList/>
+            </Route>
+            <Route path='/Registration'>
+              <Registration/>
+            </Route>
+            <Route path='/LogIn'>
+              <LogIn/>
+            </Route>
+            <Route path='/'>
+              <Home/>
+            </Route>
+          </Switch>
+        </HashRouter>
     </div>
   );
 }
 
 export default App;
+/*
+
+
+
+*/
