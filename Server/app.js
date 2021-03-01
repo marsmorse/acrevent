@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var chalk = require('chalk');
 var session = require('express-session');
+
 var redis = require("redis");
 var redisStore = require('connect-redis')(session);
 var redisClient = redis.createClient();

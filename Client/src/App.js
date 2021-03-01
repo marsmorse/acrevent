@@ -6,7 +6,10 @@ import LogIn from './components/log-in.js'
 import Registration from './components/registration.js'
 import Home from './components/home.js'
 
-import { Route, Switch, Link, HashRouter } from "react-router-dom"
+import { Route, Switch, Link, BrowserRouter } from "react-router-dom"
+import { useContext } from 'react';
+
+import { ProvideAuth, PrivateRoute } from './auth/auth';
 
 if(typeof(String.prototype.trim) === "undefined")
 {
@@ -18,44 +21,15 @@ if(typeof(String.prototype.trim) === "undefined")
 function App() {
   return (
     <div className="App">
-        <div className="dropdown">
-          <a className="dropdown-toggle" href="#" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"><span className="caret"></span>
-          </a>
-          <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <li><h3 className="dropdown-item bold">Lebron</h3></li>
-            <li><a className="dropdown-item dropdown-link" href="#">Sign Out</a></li>
-            <li><a className="dropdown-item dropdown-link" href="#">Reset Password</a></li>
-            <li><a className="dropdown-item dropdown-link" href="#">Delete Account</a></li>
-          </ul>
-        </div>
-
-        <HashRouter>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/Home">Home</Link>
-              </li>
-              <li>
-                <Link to="/Events">Events</Link>
-              </li>
-              <li>
-                <Link to="/Registration">Registration</Link>
-              </li>
-              <li>
-                <Link to="/LogIn">Log In</Link>
-              </li>
-              <li>
-                <Link to="/Creatives">Creatives</Link>
-              </li>
-            </ul>
-          </nav>
+      <ProvideAuth>
+        <BrowserRouter>
           <Switch>
             <Route path='/Home'>
               <Home/>
             </Route>
-            <Route path='/Events'>
+            <PrivateRoute path='/Events'>
               <Events/>
-            </Route>
+            </PrivateRoute>
             <Route path='/Creatives'>
               <CreativesList/>
             </Route>
@@ -69,7 +43,8 @@ function App() {
               <Home/>
             </Route>
           </Switch>
-        </HashRouter>
+        </BrowserRouter>
+      </ProvideAuth>
     </div>
   );
 }

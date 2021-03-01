@@ -23,14 +23,15 @@ module.exports = {
         user_params.password = salt + "$" + hash;
         User.create(user_params).then( user => {
             if (user) {
-                req.session.uid = cipher.encrypt(user.u_id.toString());
-                req.session.name = user.name;
-                req.session.city = user.city;
-                req.session.state = user.state;
-                req.session.c_count = user.c_count;
-                console.log(req.session);
-                
-                res.status(201).json(JSON.stringify(req.session));
+                console.log(user);
+                req.session.user = {};
+                req.session.user.uid = user.u_id
+                req.session.user.name = user.name;
+                req.session.user.city = user.city;
+                req.session.user.state = user.state;
+                req.session.user.c_count = user.c_count;
+                console.log(req.session.user);
+                res.status(201).json(JSON.stringify(req.session.user));
             } else {
                 res.status(400).send(`{ "errors": ["User created but not returned"]}`);
             }
@@ -49,12 +50,19 @@ module.exports = {
             email: req.body.email,
             password: req.body.password
         }
+            req.session.user = {}
+            req.session.user.uid = req.body.uid;
+            req.session.user.name = req.body.name;
+            req.session.user.city = req.body.city;
+            req.session.user.state = req.body.state;
+
             req.session.cookie.uid = req.body.uid;
             req.session.uid = req.body.uid;
             req.session.name = req.body.name;
             req.session.city = req.body.city;
             req.session.state = req.body.state;
             res.status(200).json(JSON.stringify(req.session));
+
     },
 
     update: (req, res) => {

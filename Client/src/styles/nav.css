@@ -1,0 +1,24 @@
+.top-nav-cont {
+    text-align: center;
+    width: 100%;
+    height: 50px;
+    padding: 15px;
+}
+.top-nav-right {
+    display: inline-flex;
+    position: absolute;
+    right: 5%;
+}
+.top-nav-center {
+    display: inline-block;
+}
+.nav-link {
+
+}
+
+@media only screen and (max-width: 800px) {
+    .top-nav-cont  {
+        text-align: left;
+        margin-left: 5%;
+    }
+  }
