@@ -1,8 +1,10 @@
 import React from 'react';
 
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { useAuth, useProvideAuth } from '../auth/auth';
 
+import { ErrStatus } from './errStatus';
 
 function LogIn() {
     let auth = useAuth();
@@ -49,10 +51,11 @@ function LogIn() {
                     <input id="password" type="password" className="form-control"/>
                   </div>
                   <button type="submit" className="btn btn-primary mt-3 mb-2">Submit</button>
-                  <p className="form-text">Don't have an account yet? <span className="highlight">Register!</span></p>
+                  <p className="form-text">Don't have an account yet? <Link className="highlight" to='/Registration' >Register!</Link></p>
                 </form>
+                <ErrStatus/>
             </div>
-            <button onClick={() => console.log(auth.user)}>get state</button>
+            <button onClick={() => {console.log(auth.error);console.log(auth.user);}}>get state</button>
         </section>
     )
 

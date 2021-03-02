@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { useAuth } from '../auth/auth'
+import { useAuth } from '../auth/auth';
+import { ErrStatus } from './errStatus';
+
+import { useHistory, Link } from 'react-router-dom';
 
 function Registration() {
+  const history = useHistory();
   const auth = useAuth();
-  const [status, changeStatus] = useState(1);
+  const [status, changeStatus] = useState('ok');
   const handleChange = (event) => {
     console.log(event.target.value)
   }
@@ -12,8 +16,11 @@ function Registration() {
     //validate input
     //check if email is not in use
     //create user
+
     let result = await auth.register({ 'email': event.target.email.value, 'password': event.target.password.value, 'city': event.target.city.value, 'state': event.target.state.value, 'name': event.target.name.value });
-    console.log(result);
+    /*if (!result) {
+      history.replace('/Creatives');
+    }*/
   }
   return(
     <section>
@@ -53,10 +60,12 @@ function Registration() {
                 <input id="password" type="password" className="form-control"/>
               </div>                     
               <button type="submit" className="btn btn-primary mt-3 mb-2">Submit</button>
-              <p className="form-text">Don't have an account yet? <span className="highlight">Register!</span></p>
+              <p className="form-text">Don't have an account yet? <Link className="highlight" to='/LogIn'>Sign in!</Link></p>
+              <ErrStatus/>
             </form>
         </div>
         <button onClick={() => console.log(auth.user)}>get state</button>
+        <button onClick={() => { history.replace('/')}}>go home</button>
     </section>
   )
         

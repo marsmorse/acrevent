@@ -19,15 +19,15 @@ module.exports = {
                     return next();
                 } else {
                     console.log('Invalid email or password');
-                    return res.status(400).send({errors: ['Invalid email or password']});
+                    return res.json({error: 'Invalid email and password combination' });
                 }
             } else {
                 console.log('email not found');
-                res.status(404).send({ errors: ['email not found'] });
+                res.status(404).json({ error: 'email not found' });
             }
         }).catch(error => {
-            console.log('email and password combination not found');
-            res.status(404).send({errors: ['email and password combination not found']});
+            console.log(error);
+            res.status(404).json({error: 'email not found'});
         })
     }
 

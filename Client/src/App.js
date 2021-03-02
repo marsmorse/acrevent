@@ -30,9 +30,9 @@ function App() {
             <PrivateRoute path='/Events'>
               <Events/>
             </PrivateRoute>
-            <Route path='/Creatives'>
+            <PrivateRoute path='/Creatives'>
               <CreativesList/>
-            </Route>
+            </PrivateRoute>
             <Route path='/Registration'>
               <Registration/>
             </Route>
