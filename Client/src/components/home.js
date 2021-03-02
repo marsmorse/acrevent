@@ -1,8 +1,12 @@
 import '../styles/homepage.css';
 import Nav from './nav';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../auth/auth';
 
 function Home() {
+  let auth = useAuth();
+  console.log(auth.user);
+  console.log(auth.error);
 
   return (
     <div className="home">

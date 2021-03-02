@@ -1,6 +1,5 @@
 import { Redirect, Route } from "react-router-dom";
 import axios from 'axios';
-
 const { useState, useContext, createContext } = require("react");
 
 
@@ -13,14 +12,26 @@ export function useAuth() {
 
 export function useProvideAuth() {
     const [user, setUser] = useState(null);
-
+    const [error, setError] = useState({message:'ok'});
+    
     const signin = (email, password) => {
+        
         axios.post('/users/login', { 'email': email, 'password': password}).then( res => {
-            let resObj = JSON.parse(res.data);
-            console.log(resObj.user);
-            console.log(res.data);
-            setUser({ isAuthenticated: true, user: JSON.parse(res.data).user });
-            return JSON.parse(res.data).user ;
+            
+            if (!res.user && res.data.error) {
+                console.log(res.data.error);
+                let message = res.data.error;
+                setError({ message: message });
+            } else {
+                let resObj = JSON.parse(res.data);
+                console.log(resObj.user);
+                console.log(res.data);
+                setUser({ isAuthenticated: true, user: JSON.parse(res.data).user });
+                
+                
+                return JSON.parse(res.data).user;
+            }
+            
         }).catch( error => { 
             console.log(error);
         })
@@ -40,12 +51,20 @@ export function useProvideAuth() {
     const register = (credentials) => {
         return new Promise( resolve => {
             axios.post('/users/register', credentials).then( res => {
-                console.log(res);
-                console.log(JSON.parse(res.data));
-                setUser({ isAuthenticated: true, user: JSON.parse(res.data)});
-                resolve(JSON.parse(res.data));
+                if (!res.user && res.data.error) {
+                    console.log(res.data.error);
+                    let message = res.data.error;
+                    setError({ message: message });
+                    resolve();
+                } else {
+                    let resObj = JSON.parse(res.data);
+                    console.log(resObj.user);
+                    console.log(res.data);
+                    setUser({ isAuthenticated: true, user: JSON.parse(res.data) });
+                    resolve(JSON.parse(res.data));
+                }
             }).catch( error => { 
-                resolve(error);
+                resolve();
             })
         })
 
@@ -55,7 +74,8 @@ export function useProvideAuth() {
         signin,
         signout,
         register,
-
+        error,
+        setError,
     }
 }
 
@@ -76,7 +96,8 @@ export function ProvideAuth({ children }) {
 export function PrivateRoute({ children, ...rest }) {
     let auth = useAuth();
     return(
-        <Route>
+        <Route
+            {...rest}
             render={({ location }) => auth.user.isAuthenticated ? (
                 children
             ) : (
@@ -87,7 +108,7 @@ export function PrivateRoute({ children, ...rest }) {
                     }}
                 />
             )
-            }
+            }>
         </Route>
-    )
+    );
 }
