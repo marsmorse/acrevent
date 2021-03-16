@@ -1,6 +1,6 @@
 # Acrevent #
 ## Description ##
-A web app designed show you when your favorite musical artists are playing a show in your area and when ticket sales start.
+A web app that shows you when your favorite musical artists are playing a show in your area and when ticket sales start.
 
 ## Summary ##
 Allows users who register/sign in to add artists to a list on the artists page of the web app. When a user does, the API calls the Songkick API with the artist to get any shows they are playing in the user's city and adds them to that users events. Project is hosted using amazon ec-2 instances.
