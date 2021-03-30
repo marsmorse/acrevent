@@ -4,12 +4,12 @@ class UserCreativeModel {
 
     getAll(u_id) {
         return new Promise((resolve, reject) => {
-            pool.query().then( res => {
+            pool.query(`SELECT * FROM user_creatives WHERE u_id = $1`, [u_id]).then( res => {
                 resolve(res);
             }).catch(err => {
                 reject(err);
             })
-        })
+        });
     }
     // deletes a user_creatives entry and removes the creative entry if their count is 0
     deleteAll(u_id) {
