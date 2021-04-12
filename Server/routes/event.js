@@ -1,9 +1,9 @@
-const eventController = require('../controllers/event-controller');
+
 var express = require('express');
 var router = express.Router();
+const user_verifier = require('../auth/user-verif.js');
+const eventController = require('../controllers/event-controller');
 
-router.get('/events/:id', eventController.getEvent);
-router.delete('/events/:id', eventController.deleteEvent);
-router.put('/events', eventController.createEvent);
 
+router.get('/all', [user_verifier.requireSession, eventController.getUserEvents])
 module.exports = router;

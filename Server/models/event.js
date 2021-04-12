@@ -1,13 +1,16 @@
 var pool = require('../db.js')
 //const userC
-var axiosInstance = require('../axios')
+var axiosInstance = require('../axios');
+const config = require('../config/config');
+
 class EventModel {
-    getAll() {
+    
+    getAllEvents(a_id) {
         return new Promise((resolve, reject) => {
-            instance.get(`/artists/${a_id}/calendar.json?apikey=${config.songkickAPIkey}`)
+            axiosInstance.get(`/artists/${a_id}/calendar.json?apikey=${config.songkickAPIkey}`)
             .then(function (response) {
                 // handle success
-                let res = []
+                let res = [];
                 console.log(response.data.resultsPage.results.artist);
                 console.log(response.data.resultsPage.results.artist[0].id);
                 req.body.songkickArtistID = response.data.resultsPage.results.artist[0].id;
@@ -20,3 +23,4 @@ class EventModel {
         });
     }
 }
+module.exports = new EventModel;

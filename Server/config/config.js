@@ -16,4 +16,7 @@ config.db.database = 'postgres';
 config.db.password = 'SunM4n&51';
 config.db.port = 5432;
 
+config.sessiontime = 5 * 1000;
+
+config.songkickAPIkey = 'BD1DoiwdEoXLyEZl';
 module.exports = config;

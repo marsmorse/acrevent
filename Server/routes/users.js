@@ -6,6 +6,9 @@ const user_verifier = require('../auth/user-verif.js');
 /* GET user's information. */
 router.get('/', user_controller.getInfo);
 
+/* GET user's information from session */
+router.get('/sessionLogin', user_controller.logInUserWithSessionCookie);
+
 /*  Create new user. */
 router.post('/register', user_controller.create);
 

@@ -4,6 +4,8 @@ const creative_model = require("../models/creative_model");
 const chalk = require('chalk');
 const crypto = require('crypto');
 const cipher = require('../auth/id-cipher')
+const { session, redisStore, redisClient, rstore} = require('../redisSession');
+
 module.exports = {
 
     create: (req, res, next) => {
@@ -14,7 +16,6 @@ module.exports = {
         let user_params = {
             email: req.body.email,
             name: req.body.name,
-            //name : { first: req.body.first, last: req.body.last }
             password: req.body.password,
             city: req.body.city
         }
@@ -23,46 +24,42 @@ module.exports = {
         user_params.password = salt + "$" + hash;
         User.create(user_params).then( user => {
             if (user) {
-                console.log(user);
-                req.session.user = {};
-                req.session.user.uid = user.u_id
-                req.session.user.name = user.name;
-                req.session.user.city = user.city;
-                req.session.user.state = user.state;
-                req.session.user.c_count = user.c_count;
-                console.log(req.session.user);
-                res.status(201).json(JSON.stringify(req.session.user));
+                req.session.user = { uid: user.u_id, name: user.name, city: user.city, state: user.state, count: user.c_count };
+                res.status(201).json(JSON.stringify({ name: user.name, city: user.city, state: user.state, count: user.c_count }));
             } else {
                 res.status(400).send(`{ "errors": ["User created but not returned"]}`);
             }
         }).catch(error => {
-            console.log(error);
              console.log(`❌ Error creating user: ${error.message}`);
              res.status(400).send(error);
         });
 
     },
+    logInUserWithSessionCookie: (req, res) => {
+        if (req.sessionID) {
+            rstore.get(`${req.sessionID}`, (error, session) => {
+                if (error) {
+                    console.log(error);
+                    res.status(400).send(`Must log in to request profile info\n`);
+                } else {
+                    if (!session) {
+                        console.log(chalk.bgMagenta('session not found'));
+                        res.send(`Invalid Session`);
+                    } else {
+                        console.log(chalk.bgMagenta('User session found from cookie id'));
+                        console.log(chalk.bgMagenta(session.user));
+                        console.log(session.user);
+                        res.status(200).json({ name: session.user.name, city: session.user.city, state: session.user.state, count: session.user.count });
+                    }
+                }
+            })
+        }
+        res.status(400);
+    },
 
     logIn: (req, res) => {
-        console.log("logging in user");
-        // Validation happens in middle ware function that comes before this
-        let login_params = {
-            email: req.body.email,
-            password: req.body.password
-        }
-            req.session.user = {}
-            req.session.user.uid = req.body.uid;
-            req.session.user.name = req.body.name;
-            req.session.user.city = req.body.city;
-            req.session.user.state = req.body.state;
-
-            req.session.cookie.uid = req.body.uid;
-            req.session.uid = req.body.uid;
-            req.session.name = req.body.name;
-            req.session.city = req.body.city;
-            req.session.state = req.body.state;
-            res.status(200).json(JSON.stringify(req.session));
-
+        req.session.user = { uid: req.body.uid, name: req.body.name, city: req.body.city, state: req.body.state }            
+        res.status(200).json(JSON.stringify(req.session.user));
     },
 
     update: (req, res) => {
@@ -72,7 +69,6 @@ module.exports = {
 
        let users = [req.body.newpass, session.name, session.city, session.state]
         User.update(15, req.body.newpass).then( data => {
-            console.log(`✓`);
             res.status(200).send("✓\n");
         }).catch(error => {
              res.status(400).send(`❌ Error: ${error.message}\n`);
