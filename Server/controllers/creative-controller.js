@@ -3,94 +3,86 @@ const User = require('../models/user_model')
 var chalk = require('chalk');
 const UserCreative = require('../models/user_creative_model');
 const cipher = require('../auth/id-cipher');
-module.exports = {
+const { session, redisStore, redisClient, rstore} = require('../redisSession');
+const eventController = require('./event-controller');
 
-    /* returns an all creatives for a user*/
-    getCreatives: (req, res) => {
-        if (req.session.id) { 
-            console.log((req.session.id));
-            Creative.getAllUserCreatives(req.body.uid).then( data => {
-                console.log(data);
-                res.status(200).json(data);
-            }).catch( error => {
-                res.status(400).send(`❌ Error: ${error.message}\n`);
+const config = require('../config/config');
+const axios = require('axios');
+const instance = axios.create({
+    baseURL: 'https://api.songkick.com/api/3.0/',
+    timeout: 2000
+  });
+
+module.exports = {
+    validArtist: (req, res, next) => {
+        if (req.body.name) {
+            instance.get(`/search/artists.json?apikey=${config.songkickAPIkey}&query=${req.body.name}`)
+            .then(function (response) {
+                // handle success
+                console.log(response.data.resultsPage.results.artist);
+                console.log(response.data.resultsPage.results.artist[0].id);
+                req.body.songkickArtistID = response.data.resultsPage.results.artist[0].id;
+                req.body.name = response.data.resultsPage.results.artist[0].displayName;
+                next();
+            }) 
+            .catch( (err) => {
+                console.log(err);
+                res.status(404).send();
             })
         } else {
-            res.status(400).send(`Must log in to request profile info\n`);
+            res.status(400).send();
         }
+    },
+    /* returns an all creatives for a user*/
+    getCreatives: (req, res) => {           
+        Creative.getAllUserCreatives(req.session.uid).then( data => {
+            res.status(200).json(data);
+        }).catch( error => {
+            console.log(`❌ Error: ${error.message}`);
+            res.status(400).send(`❌ Error: ${error.message}`);
+        })
     },
 
     addCreative: (req, res) => {
-        //console.log(req.session);
-        //console.log(req.session.id);
-        console.log(req.body);
-        
-        function addCreatives(uid) {
-            return new Promise((resolve, reject) => {
-                let count = 0;
-                req.body.creatives.forEach( creative_name => {
-                    console.log("requesting from db");
-                    Creative.get(creative_name).then( data => {
-                        console.log(data.length);
-                        // if creatives exists in db already
-                        if (data.length >= 1) {
-                            Creative.addUserCreative(data[0].c_id, uid).then( cid => {
-                                count ++;
+                let uid = req.uid;
+                console.log(req.body);
+                let creative_name = req.body.name;
+                console.log(creative_name);
+                Creative.get(creative_name).then( data => {
+                    // if creatives exists in db already
+                    if (data.length >= 1) {
+                        Creative.addUserCreative(data[0].c_id, uid).then( cid => {
+                            console.log(`SUCCESS 👍🏻: ${creative_name} added`);
+                            eventController.getArtistEvents();
+                            //res.status(201).json(`SUCCESS 👍🏻: ${creative_name} added`);
+                        }).catch( error => {
+                            console.log(`❌ Error adding user_creative for creative with user with id ${uid} : ${error.message}\n`);
+                            res.json({error: `User already has creative`, code: 400});
+                        })
+                    } else { //creative not in database yet
+                        Creative.create({name: creative_name, type:'music'}).then( cinfo => {
+                            Creative.addUserCreative(cinfo.c_id, uid).then( dbresult => {
+                                eventController.getArtistEvents();
                                 console.log(`SUCCESS 👍🏻: ${creative_name} added`);
-                                console.log(count);
-                                console.log(eq.body.creatives.length);
-                                if (count == req.body.creatives.length) resolve();
-                            }).catch( error => {
-                                res.status(400).send(`❌ Error adding user_creative for creative with user with id ${uid} : ${error.message}\n`);
+                                //res.status(201).json(`SUCCESS 👍🏻: ${creative_name} added`);
+                             }).catch( error => {
+                                console.log(`❌ Error adding user_creative for creative ${cinfo.name} with user with id${uid}: ${error.message}\n`)
+                                res.status(400).send(`❌ Error adding user_creative for creative ${cinfo.name} with user with id${uid}: ${error.message}\n`);
                             })
-                        } else { //creative not in database yet
-                            Creative.create({name: creative_name, type:'music'}).then( cinfo => {
-                                Creative.addUserCreative(cinfo.c_id, uid).then( dbresult => {
-                                    //counts are automatically incremented by trigger
-                                    count ++;
-                                    console.log(`SUCCESS 👍🏻: ${creative_name} added`);
-                                    console.log(count);
-                                    console.log(req.body.creatives.length);
-                                    if (count == req.body.creatives.length) resolve();
-                                 }).catch( error => {
-                                    reject(error);
-                                    res.status(400).send(`❌ Error adding user_creative for creative ${cinfo.name} with user with id${uid}: ${error.message}\n`);
-                                })
-                            }).catch( error => {
-                                console.log(`Couldn't create new Creative: ${error}\n`)
-                                res.status(400).send(`❌ Error adding user_creative for creative ${ creative_name } with user with id ${uid}: ${error.message}\n`);
-                            })
-                        }
-                    }).catch( error => {
-                        res.status(400).send(`❌ Error with getting creative: ${error.message}\n`);
-
-                    })
-
-                });
-            })
-        }
-        
-        //console.log(cipher.decrypt(req.session.sid));
-        if (req.session.id) {
-            //check if creative exists\
-            let uid = 35;
-            if (req.body.creatives != null && uid) {
-                addCreatives(uid).then( data => {
-                    res.status(201).json("All Creatives added successfully")
-                });
-
-            } else {
-                res.status(400).send(`{ "errors": ["Name and type missing in request"]}`);
-            }
-        } else {
-            res.status(400).send(`{ "errors": ["User must be logged supplied in body. for this action"]}`);
-       }
+                        }).catch( error => {
+                            console.log(`Couldn't create new Creative: ${error}\n`)
+                            res.status(400).send(`❌ Error adding user_creative for creative ${ creative_name } with user with id ${uid}: ${error.message}\n`);
+                        })
+                    }
+                }).catch( error => {
+                    res.status(400).send(`❌ Error with getting creative: ${error.message}\n`);
+                })
     },
 
     removeCreative: (req, res) => {
         //get user_count of creative from name (because it's unique)
         if (req.session.id) {
-            const name = req.params.name;
+            const name = req.body.name;
             console.log(name);
             Creative.get(name).then( data => {
                 let uid = 35;

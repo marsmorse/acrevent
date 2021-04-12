@@ -4,8 +4,8 @@ class UserCreativeModel {
 
     getAll(u_id) {
         return new Promise((resolve, reject) => {
-            pool.query(`SELECT * FROM user_creatives WHERE u_id = $1`, [u_id]).then( res => {
-                resolve(res);
+            pool.query(`SELECT c_id FROM user_creatives WHERE u_id = $1`, [u_id]).then( res => {
+                resolve(res.rows.map(row => { return row.c_id; }));
             }).catch(err => {
                 reject(err);
             })

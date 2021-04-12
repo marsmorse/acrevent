@@ -1,24 +1,19 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var chalk = require('chalk');
-var session = require('express-session');
+//var session = require('express-session');
 
-var redis = require("redis");
-var redisStore = require('connect-redis')(session);
-var redisClient = redis.createClient();
+const { session, redisStore, redisClient, rstore} = require('./redisSession');
 var uuid = require('uuid');
-var config = require('./config/config');
+
 //var passport = require('./auth/passport-login');
 const passport = require('passport');
 const User = require('./models/user_model.js')
 const LocalStrategy = require('passport-local').Strategy;
 
-redisClient.on('error', (err) => {
-  console.log('Redis error: ', err);
-});
+
 
 
 
@@ -32,31 +27,59 @@ var dev = require('./devModel');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 /*
   Middleware functions
 */
+var config = require('./config/config');
+var globalConfig = require('../global.config');
+
+
+
 app.use(session({
     genid : function(req) {
       return uuid.v4();
     },
     secret: config.secret,
-    store: new redisStore({ host: config.redis.host, port: config.redis.port, client: redisClient }),
-    saveUninitialized: true,
+    store: rstore,
+    saveUninitialized: false,
     resave: false,
-    cookie: { secure: false, maxAge: 60000 * 5 } //five minutes
+    cookie: { secure: false, maxAge: globalConfig.sessiontime } //five minutes
     })
 );
 
+/*
+middleware that retrieves the user id from the session store
+*/
+app.use( (req, res, next) => {
+  rstore.get(`${req.sessionID}`, (error, session) => {
+    if (error) {
+        console.log(error);
+        res.status(400).send(`Must log in to request profile info\n`);
+    } else {
+        if (!session) {
+          console.log(chalk.bgCyan('session not found'));
+        } else {
+          console.log(chalk.bgCyan('session found'));
+          console.log(session);
+          req.uid = session.user.uid;
+          req.city = session.user.city;
+          req.state = session.user.state;
+        }
+        console.log(`uid in middleware = ${req.uid}`)
+        next()
+    }
+    
+  })
+})
 /*
 Routers
 */
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var eventsRouter = require('./routes/event');
 var creativesRouter = require('./routes/creative');
+var eventsRouter = require('./routes/event');
 var devRouter = require('./routes/dev');
 
 app.use('/', indexRouter);

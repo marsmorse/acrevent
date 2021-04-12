@@ -2,6 +2,7 @@ const User = require("../models/user_model")
 const crypto = require('crypto');
 
 module.exports = {
+
     isEmailPasswordMatch: (req, res, next) => {
         User.getUserWithEmail(req.body.email).then( user => {
             if (user[0]) {
@@ -29,6 +30,15 @@ module.exports = {
             console.log(error);
             res.status(404).json({error: 'email not found'});
         })
+    },
+
+    requireSession: (req, res, next) => {
+        if (req.uid) {
+            console.log(`userID: ${req.uid}`);
+            next();
+        } else {
+            res.json({error: `Invalid Session`, code: 400});
+        }
     }
 
 }
