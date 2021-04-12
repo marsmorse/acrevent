@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-
-const temp_id = 28;
+import { useAuth } from '../auth/auth'
 
 function ExistingCreativesListItems({ mode }) {
+    let auth = useAuth();
     const [existingCreatives, setExistingCreatives] = useState(null);
     useEffect(() => {
         axios.get('/creatives/all').then( res => {
+            console.log(res.data)
             setExistingCreatives(res.data.map( c => { return c.name }));
         }).catch( error => { console.log(error); })
     }, []);
@@ -18,7 +19,11 @@ function ExistingCreativesListItems({ mode }) {
             //setExistingCreatives(existingCreatives.filter(item => item !== event.target.innerHTML));
             axios.delete(`/creatives/${event.target.innerHTML}`).then( res => {
                 console.log(res);
-                setExistingCreatives(existingCreatives.filter(item => item !== event.target.innerHTML));
+                if (res === 'Invalid Session') {
+                    auth.setError('Session Expired');
+                } else {
+                    setExistingCreatives(existingCreatives.filter(item => item !== event.target.innerHTML));
+                }
             }).catch( error => { console.log(error); })
             console.log(existingCreatives);
         }
@@ -41,25 +46,23 @@ function ExistingCreativesListItems({ mode }) {
 function NewCreativesList({ mode }) {
     const [newCreatives, setNewCreatives] = useState([]);
     //Find out interval for saving new Creatives to the Database
-    const listRef = useRef([]);
-    useEffect(() => {
+    let auth = useAuth();
+    const listRef = useRef(newCreatives.length);
 
-        listRef.current = newCreatives;
+    useEffect(() => {
+        console.log(`listref = ${listRef} and newCreativeLength = ${newCreatives.length}`)
+        if (newCreatives.length > listRef.current) {
+            console.log(newCreatives);
+            axios.post(`/creatives`, { 'name': newCreatives[0], 'type': 'music'}).then( res => {
+                console.log(res.data)
+                if (res.data.error === 'Invalid Session') {
+                    auth.setError('Session Expired');
+                }
+                console.log(res);
+            }).catch( error => { console.log(error); })
+        }
+        listRef.current = newCreatives.length;        
     }, [newCreatives]);
-
-    useEffect(() => {
-        return function cleanup() {
-            if (listRef.current.length > 0) {
-                const body = {};
-                body['creatives'] = listRef.current;
-                body['type'] = 'music';
-                console.log(body)
-                axios.post('/creatives', body).then( res => {
-                    console.log(res);
-                }).catch( error => { console.log(error); })
-            }
-        };
-    }, []);
 
 
     const addNewCreative = (input) => {
@@ -72,7 +75,7 @@ function NewCreativesList({ mode }) {
     const handleClick = (event) => {
         if (mode === 'delete') {
             setNewCreatives(newCreatives.filter(item => item !== event.target.innerHTML));
-            axios.delete('/creatives', { name: event.target.innerHTML, uid: temp_id}).then( res => {
+            axios.delete('/creatives', { name: event.target.innerHTML, uid: auth.user.profile.uid }).then( res => {
                 setNewCreatives(newCreatives.filter(item => item !== event.target.innerHTML));
             }).catch( error => { console.log(error); })
         }
