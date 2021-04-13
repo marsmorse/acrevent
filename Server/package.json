@@ -23,7 +23,10 @@
     "passport-local": "^1.0.0",
     "pg": "^8.5.1",
     "redis": "^3.0.2",
+<<<<<<< HEAD
     "request": "^2.88.2",
+=======
+>>>>>>> ed21062d8e80af59c72d46aad77b57f8580252e2
     "uuid": "^8.3.2"
   },
   "devDependencies": {
