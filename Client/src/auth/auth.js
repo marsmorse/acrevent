@@ -1,6 +1,7 @@
-import { Redirect, Route } from "react-router-dom";
+import { Redirect, Route, browserHistory, useHistory } from "react-router-dom";
 import axios from 'axios';
-const { useState, useContext, createContext } = require("react");
+
+const { useState, useContext, createContext, useEffect } = require("react");
 
 
 
@@ -11,31 +12,49 @@ export function useAuth() {
 }
 
 export function useProvideAuth() {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState({ isAuthenticated: false, profile: null});
     const [error, setError] = useState({message:'ok'});
-    
+    const history = useHistory();
+
+
+
+    useEffect(() => {
+            axios.get('/users/sessionLogin').then( res => {
+                if (res.data === 'Invalid Session') {
+                    setUser({ isAuthenticated: false, profile: null })
+                    history.push('/LogIn');
+                } else if (typeof res.data !== undefined) {
+                    console.log('setting user');
+                    setUser({ isAuthenticated: true, profile: res.data, sessionExpiration: res.data})
+                    console.log('user set');
+                } else {
+                    console.log('no luck');
+                }
+
+            }).catch( err => {
+                console.log(err);
+            })
+    }, [])
+
     const signin = (email, password) => {
-        
-        axios.post('/users/login', { 'email': email, 'password': password}).then( res => {
-            
-            if (!res.user && res.data.error) {
-                console.log(res.data.error);
-                let message = res.data.error;
-                setError({ message: message });
-            } else {
-                let resObj = JSON.parse(res.data);
-                console.log(resObj.user);
-                console.log(res.data);
-                setUser({ isAuthenticated: true, user: JSON.parse(res.data).user });
+        return new Promise( resolve => {
+            axios.post('/users/login', { 'email': email, 'password': password}).then( res => {
                 
+                if (!res.data.user && res.data.error) {
+                    //console.log(res.data.error);
+                    let message = res.data.error;
+                    setError({ message: message });
+                    resolve('error');
+                } else {
+                    setUser({ isAuthenticated: true, profile: JSON.parse(res.data) });
+                    resolve('success');
+                }
                 
-                return JSON.parse(res.data).user;
-            }
-            
-        }).catch( error => { 
-            console.log(error);
-        })
-        //sign in 
+            }).catch( error => { 
+                console.log(error);
+                resolve('error');
+            })
+        });
     }
 
     const signout = () => {
@@ -60,7 +79,7 @@ export function useProvideAuth() {
                     let resObj = JSON.parse(res.data);
                     console.log(resObj.user);
                     console.log(res.data);
-                    setUser({ isAuthenticated: true, user: JSON.parse(res.data) });
+                    setUser({ isAuthenticated: true, profile: JSON.parse(res.data) });
                     resolve(JSON.parse(res.data));
                 }
             }).catch( error => { 
@@ -71,6 +90,7 @@ export function useProvideAuth() {
     }
     return {
         user,
+        setUser,
         signin,
         signout,
         register,
@@ -103,7 +123,7 @@ export function PrivateRoute({ children, ...rest }) {
             ) : (
                 <Redirect
                     to={{
-                        pathname: '/login',
+                        pathname: '/LogIn',
                         state: { from: location }
                     }}
                 />
@@ -112,3 +132,24 @@ export function PrivateRoute({ children, ...rest }) {
         </Route>
     );
 }
+
+export function PublicRoute({ children, ...rest }) {
+    let auth = useAuth();
+    return(
+        <Route
+            {...rest}
+            render={({ location }) => auth.user.isAuthenticated ? (
+                <Redirect
+                    to={{
+                        pathname: '/Events',
+                        state: { from: location }
+                    }}
+                />
+                
+            ) : (
+                children
+            )
+            }/>
+    );
+}
+

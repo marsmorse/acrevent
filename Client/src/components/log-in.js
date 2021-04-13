@@ -3,27 +3,33 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { useAuth, useProvideAuth } from '../auth/auth';
-
+import { useHistory, useLocation } from 'react-router-dom';
 import { ErrStatus } from './errStatus';
 
 function LogIn() {
-    let auth = useAuth();
+  let history = useHistory();
+  let location = useLocation();
+  let auth = useAuth();
 
-    const handleChange = (event) => {
-        console.log(event.target.value)
-    }
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        // authenticate
+  let { from } = location.state || { from: { pathname: "/" } };
 
-        //update react state to reflect the authentication
+  const handleChange = (event) => {
+      console.log(event.target.value)
+  }
 
-        //route to the user's events page
-
-        console.log(event.target.password.value);
-        console.log(event.target.email.value);
-        auth.signin(event.target.email.value, event.target.password.value);
-    }
+  const handleSubmit = async (event) => {
+      event.preventDefault();
+      // authenticate  
+      //update react state to reflect the authentication   
+      //route to the user's events page    
+      console.log(event.target.password.value);
+      console.log(event.target.email.value);
+      let result = await auth.signin(event.target.email.value, event.target.password.value);
+      console.log(result)
+      if (result === 'success') {
+          history.replace('/Events');
+      } 
+  }
 
     return(
         <section>
@@ -55,7 +61,7 @@ function LogIn() {
                 </form>
                 <ErrStatus/>
             </div>
-            <button onClick={() => {console.log(auth.error);console.log(auth.user);}}>get state</button>
+            <button onClick={() => { console.log(auth.error); console.log(auth.user); }}>get state</button>
         </section>
     )
 
