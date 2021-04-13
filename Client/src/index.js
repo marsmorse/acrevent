@@ -3,9 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { ProvideAuth } from './auth/auth';
 
 ReactDOM.render(
-      <App />,
+  <ProvideAuth>
+      <App />
+  </ProvideAuth>,
   document.getElementById('root')
 );
 
