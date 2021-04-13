@@ -10,14 +10,6 @@ function Home() {
 
   return (
     <div className="home">
-      <div className="top-nav-cont">
-        <div></div>
-        <img src='../logo.svg' alt='Acrevent logo' className="top-nav-center"></img>
-        <div className="top-nav-right">
-          <Link className='nav-link text-nowrap' to='/LogIn'>Sign In</Link>
-          <Link className='nav-link text-nowrap' to='/Registration'>Register</Link>
-        </div>
-      </div>
       <div className='d-flex flex-column full-page'>
         <div id="landing-cont">
           <div id="landing-sub-cont">

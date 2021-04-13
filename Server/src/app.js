@@ -33,7 +33,6 @@ app.use(express.static(path.join(__dirname, 'public')));
   Middleware functions
 */
 var config = require('./config/config');
-var globalConfig = require('../global.config');
 
 
 
@@ -45,7 +44,7 @@ app.use(session({
     store: rstore,
     saveUninitialized: false,
     resave: false,
-    cookie: { secure: false, maxAge: globalConfig.sessiontime } //five minutes
+    cookie: { secure: false, maxAge: 1000 * 60 * 10 } //10 minutes
     })
 );
 

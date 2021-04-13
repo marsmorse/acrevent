@@ -15,7 +15,7 @@ function List(content) {
         }).catch( error => { console.log(`ERRORJ: ${error}`); })
     }, []);
     //Error: Request failed with status code 404
-
+    console.log(events);
     if ((typeof events === 'object') && Array.isArray(events) ){
         return(
             <div className="list-group">
