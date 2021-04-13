@@ -5,46 +5,51 @@ import CreativesList from './components/creatives.js'
 import LogIn from './components/log-in.js'
 import Registration from './components/registration.js'
 import Home from './components/home.js'
+import TopNav from './components/top-nav'
 
-import { Route, Switch, Link, BrowserRouter } from "react-router-dom"
-import { useContext } from 'react';
+import { Switch, BrowserRouter } from "react-router-dom"
+import { useEffect } from 'react';
 
-import { ProvideAuth, PrivateRoute } from './auth/auth';
-
-if(typeof(String.prototype.trim) === "undefined")
-{
-    String.prototype.trim = function() 
-    {
-        return String(this).replace(/^\s+|\s+$/g, '');
-    };
-}
+import { PrivateRoute, PublicRoute } from './auth/auth';
+import { useAuth } from './auth/auth';
+import config from './config';
 function App() {
+  let auth = useAuth();
+  useEffect(() => {
+    if (auth.user.isAuthenticated === true) {
+      setTimeout(function(){
+        auth.setUser({ isAuthenticated: false, profile: null });
+      }, config.sessiontime);
+    }
+  }, [auth.user.isAuthenticated])
+
+  //window.location.reload(false);
   return (
     <div className="App">
-      <ProvideAuth>
+      
         <BrowserRouter>
           <Switch>
-            <Route path='/Home'>
-              <Home/>
-            </Route>
             <PrivateRoute path='/Events'>
+              <TopNav/>
               <Events/>
             </PrivateRoute>
             <PrivateRoute path='/Creatives'>
+              <TopNav/>
               <CreativesList/>
             </PrivateRoute>
-            <Route path='/Registration'>
+            <PublicRoute path='/Registration'>
               <Registration/>
-            </Route>
-            <Route path='/LogIn'>
+            </PublicRoute>
+            <PublicRoute path='/LogIn'>
               <LogIn/>
-            </Route>
-            <Route path='/'>
+            </PublicRoute>
+            <PublicRoute path='/'>
+              <TopNav/>
               <Home/>
-            </Route>
+            </PublicRoute>
           </Switch>
         </BrowserRouter>
-      </ProvideAuth>
+        
     </div>
   );
 }
