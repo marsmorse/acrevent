@@ -1,4 +1,4 @@
-var pool = require('../db.js')
+var pool = require('../dbModel.js')
 
 class CreativeModel {
 

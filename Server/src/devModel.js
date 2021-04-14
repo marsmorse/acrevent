@@ -1,4 +1,4 @@
-var pool = require('./db.js');
+var pool = require('./dbModel.js');
 var chalk = require('chalk')
 const Table = require('cli-table')
 class Dev {

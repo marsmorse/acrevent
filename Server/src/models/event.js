@@ -1,4 +1,4 @@
-var pool = require('../db.js')
+var pool = require('../dbModel.js')
 //const userC
 var axiosInstance = require('../axios');
 const config = require('../config/config');
