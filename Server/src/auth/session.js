@@ -6,7 +6,7 @@ module.exports = {
     createSession: (req, res, next) => {
         console.log("creating session");
         return session({
-          secret: 'GirlsInPants62',
+          secret: 'REDACTED',
           store: new redisStore({ host:'localhost', port: 6379, client: redisClient, ttl: 60000 * 2 }),
           saveUninitialized: true,
           resave: false,
