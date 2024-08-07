@@ -4,9 +4,9 @@ let Secret = new (function () {
     "use strict";
     const algorithm = 'aes256';
     //needs to be 32 bytes
-    const ENCRYPTION_KEY = 'FamAdvGui&HikTheCal87tHfrk82dh34'; // or generate sample key Buffer.from('FoCKvdLslUuB4y3EZlKate7XGottHski1LmyqJHvUhs=', 'base64');
+    const ENCRYPTION_KEY = "REDACTED"
     const IV_LENGTH = 16;
-    const iv = crypto.createHash("sha256").update("RonaldMcDonald").digest();
+    const iv = crypto.createHash("sha256").update("REDACTED").digest();
 
     const resized_iv = Buffer.allocUnsafe(16);
 
